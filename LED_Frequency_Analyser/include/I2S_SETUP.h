@@ -1,7 +1,7 @@
-#ifndef HARDWARE_H
-#define HARDWARE_H
+#ifndef I2S_SETUP_H
+#define I2S_SETUP_H
 
-#include "Defs.h"
+#include <Arduino.h>
 #include <driver/i2s.h>
 
 #define I2S_WS 25
@@ -11,12 +11,11 @@
 #define I2S_PORT I2S_NUM_0
 
 #define SAMPLING_FREQUENCY 44100
-#define BUFFER_LEN 1024
-int16_t readBuffer[BUFFER_LEN];
+#define NB_SAMPLES 1024
+int16_t readBuffer[NB_SAMPLES];
 
 void setup_i2s()
 {
-  Serial.println("Configuring I2S...");
   esp_err_t err;
 
   // Set up I2S Processor configuration
@@ -28,7 +27,7 @@ void setup_i2s()
       .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
       .intr_alloc_flags = 0,
       .dma_buf_count = 4,
-      .dma_buf_len = BUFFER_LEN,
+      .dma_buf_len = NB_SAMPLES,
       .use_apll = false};
 
   err = i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
@@ -61,4 +60,19 @@ void setup_i2s()
   }
 }
 
-#endif /*   HARDWARE_H    */
+int readSampledData()
+{
+  size_t readBytes = 0;
+  esp_err_t result = i2s_read(I2S_PORT, &readBuffer, sizeof(readBuffer), &readBytes, portMAX_DELAY);
+  if (readBytes != sizeof(readBuffer))
+  {
+    Serial.printf("Could only read %u bytes of %u in FillBufferI2S()\n", readBytes, sizeof(readBuffer));
+    // return;
+  }
+
+  int readSamples = readBytes / sizeof(int16_t); // 16 bit per sample
+
+  return readSamples;
+}
+
+#endif /*   I2S_SETUP_H    */
