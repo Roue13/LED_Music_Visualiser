@@ -10,7 +10,7 @@
 
 #define I2S_PORT I2S_NUM_0
 
-#define SAMPLING_FREQUENCY 44100
+#define SAMPLING_FREQUENCY 48000
 #define NB_SAMPLES 1024
 int16_t readBuffer[NB_SAMPLES];
 

@@ -12,10 +12,10 @@
 #define DATA_PIN 23
 
 #define AVERAGE_FACTOR 85 // Between 0 (soft) and 100 (reactive) --> 70 juste milieu
-#define AMPLITUDE 9000    // Bigger = More attenuation
+#define AMPLITUDE 10000   // Bigger = More attenuation
 #define BRIGHTNESS 200
 #define MAX_CURRENT_MA 2000
-#define PEAK_DECAY_SPEED 100
+#define PEAK_DECAY_SPEED 70
 
 CRGB leds[NUM_BANDS * NUM_LEDS_PER_BAND];
 
@@ -68,7 +68,7 @@ void drawBandsHeights()
 {
   for (int16_t x = 0; x < NUM_BANDS; x++)
   {
-    for (int16_t y = bandValues[x]; y > 0; y--)
+    for (int16_t y = bandValues[x]; y >= 0; y--)
     {
       matrix->drawPixel(x, y, CRGB(250)); // Change color here
     }

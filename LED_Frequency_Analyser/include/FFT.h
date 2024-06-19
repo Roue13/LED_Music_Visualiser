@@ -94,7 +94,7 @@ void assignFreqBinsValues()
             bandValues[9] += (int)vReal[i];
     }*/
 
-    // For Fs = 44 100 Hz from 100 Hz to 12000 kHz
+    /* For Fs = 44 100 Hz from 100 Hz to 12000 kHz
     for (int i = 1; i < (NB_SAMPLES / 2); i++)
     {
         if (i <= 3)
@@ -116,6 +116,31 @@ void assignFreqBinsValues()
         if (i > 130 && i <= 221)
             bandValues[8] += (int)vReal[i];
         if (i > 221 && i <= 376)
+            bandValues[9] += (int)vReal[i];
+    }*/
+
+    // For Fs = 44 100 Hz from 100 Hz to 12000 kHz
+    for (int i = 1; i < (NB_SAMPLES / 2); i++)
+    {
+        if (i <= 2)
+            bandValues[0] += (int)vReal[i];
+        if (i > 2 && i <= 4)
+            bandValues[1] += (int)vReal[i];
+        if (i > 4 && i <= 7)
+            bandValues[2] += (int)vReal[i];
+        if (i > 7 && i <= 12)
+            bandValues[3] += (int)vReal[i];
+        if (i > 12 && i <= 22)
+            bandValues[4] += (int)vReal[i];
+        if (i > 22 && i <= 38)
+            bandValues[5] += (int)vReal[i];
+        if (i > 38 && i <= 66)
+            bandValues[6] += (int)vReal[i];
+        if (i > 66 && i <= 115)
+            bandValues[7] += (int)vReal[i];
+        if (i > 115 && i <= 201)
+            bandValues[8] += (int)vReal[i];
+        if (i > 201 && i <= 351)
             bandValues[9] += (int)vReal[i];
     }
 }
