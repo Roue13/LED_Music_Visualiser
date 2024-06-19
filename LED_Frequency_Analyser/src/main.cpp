@@ -16,6 +16,7 @@ void setup()
 
 void loop()
 {
+  FastLED.clear();
   int readSamples = readSampledData(); // Gets data from DMA buffers
 
   for (int i = 0; i < readSamples; i++)
@@ -27,14 +28,12 @@ void loop()
   computeFFT();           // Applies all FFT calculations
   assignFreqBinsValues(); // Gets values for frequency bands
   processBands();         // Assign new band heights and peaks values
-  displayInMonitor();
-  /*drawBandsHeights();     // Draw new band heights values
+  drawBandsHeights();     // Draw new band heights values
   drawPeaks();            // Draw new band peaks   values
   EVERY_N_MILLISECONDS(PEAK_DECAY_SPEED)
   {
     peaksDecay();
   }
 
-  FastLED.show();*/
-  delay(50);
+  FastLED.show();
 }
