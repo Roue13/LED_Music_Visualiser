@@ -11,19 +11,19 @@
 #define NUM_LEDS_PER_BAND 12
 #define DATA_PIN 23
 
-#define AMPLITUDE 1000
+#define AMPLITUDE 3000
 #define BRIGHTNESS 200
-#define MAX_CURRENT 2000 // mA
+#define MAX_CURRENT_MA 2000
 #define PEAK_DECAY_SPEED 50
 
 CRGB leds[NUM_BANDS * NUM_LEDS_PER_BAND];
 
 // For 8 bands
-uint8_t oldBandValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
-uint8_t bandValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
-uint8_t bandPeaks[] = {0, 0, 0, 0, 0, 0, 0, 0};
+int oldBandValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
+int bandValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
+int bandPeaks[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-int bandFreqLabels[] = {125, 250, 500, 1000, 2000, 4000, 8000, 16000};
+const char *bandFreqLabels[] = {"125 Hz", "250 Hz", "500 Hz", "1 kHz ", "2 kHz ", "4 kHz ", "8 kHz ", "16 kHz"};
 
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, NUM_BANDS, NUM_LEDS_PER_BAND,
                                                   NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
@@ -32,7 +32,7 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, NUM_BANDS, NUM_LEDS_PER_
 void initDisplay()
 {
   FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_BANDS * NUM_LEDS_PER_BAND); // GRB ordering is typical
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT_MA);
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear();
 
@@ -44,11 +44,12 @@ void processBands()
   for (uint8_t band = 0; band < NUM_BANDS; band++)
   {
     // Process Bands Height
-    uint8_t barHeight = bandValues[band] / AMPLITUDE;
-    if (barHeight > NUM_LEDS_PER_BAND)
+    bandValues[band] = bandValues[band] / AMPLITUDE;
+    if (bandValues[band] > NUM_LEDS_PER_BAND)
     {
       bandValues[band] = NUM_LEDS_PER_BAND;
     }
+
     // barHeight = ((oldBandValues[band] * 1) + bandValues) / 2;     // Small amount of averaging between frames
     oldBandValues[band] = bandValues[band];
 
@@ -58,6 +59,7 @@ void processBands()
       bandPeaks[band] = min((const int)bandValues[band], NUM_LEDS_PER_BAND);
     }
   }
+  Serial.println("   ");
 }
 
 void drawBandsHeights()
@@ -86,6 +88,24 @@ void peaksDecay()
     if (bandPeaks[band] > 0)
       bandPeaks[band] -= 1;
   }
+}
+
+void displayInMonitor()
+{
+  for (uint8_t band = 0; band < NUM_BANDS; band++)
+  {
+    Serial.print(bandFreqLabels[band]);
+    Serial.print(" : ");
+    for (int i = 0; i < bandValues[band]; i++)
+    {
+      Serial.print("=");
+    }
+    Serial.println("");
+  }
+  /*for (int n = 0; n < 20; n++)
+  {
+    Serial.println(" ");
+  }*/
 }
 
 #endif /*   DISPLAY_H   */

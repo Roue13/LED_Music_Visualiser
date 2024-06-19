@@ -3,10 +3,10 @@
 
 #include <arduinoFFT.h>
 
-float vReal[NB_SAMPLES];
-float vImag[NB_SAMPLES];
+double vReal[NB_SAMPLES];
+double vImag[NB_SAMPLES];
 
-ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, NB_SAMPLES, SAMPLING_FREQUENCY);
+ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, NB_SAMPLES, SAMPLING_FREQUENCY);
 
 /*
 ----- Frequency bins for 125 Hz --> 16 kHz at Fs = 44,1 kHz -----
@@ -44,6 +44,11 @@ void computeFFT()
 
 void assignFreqBinsValues()
 {
+    for (int band = 0; band < NUM_BANDS; band++)
+    {
+        bandValues[band] = 0;
+    }
+
     for (int i = 2; i < (NB_SAMPLES / 2); i++)
     {
         if (i <= 4)
