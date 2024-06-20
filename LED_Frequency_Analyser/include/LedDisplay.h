@@ -61,7 +61,7 @@ void drawBandsHeights()
   {
     for (int y = 0; y <= bandValues[x]; y++)
     {
-      matrix->drawPixel(x, y, CRGB(250)); // Change color here
+      matrix->drawPixel(x, y, ColorFromPalette(pinkRedPal, constrain(bandValues[y] * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
     }
   }
 }
