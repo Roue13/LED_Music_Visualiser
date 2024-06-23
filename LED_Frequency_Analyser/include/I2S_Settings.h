@@ -3,17 +3,18 @@
 
 #include <Arduino.h>
 #include <driver/i2s.h>
+#include <driver/adc.h>
 
-#define I2S_PORT I2S_NUM_0  // Use I2S0 peripheral
+#define I2S_PORT I2S_NUM_0 // Use I2S0 peripheral
 
 int16_t readBuffer[NB_SAMPLES];
 
-
-void setup_i2s() {
+void setup_i2s_MEMS()
+{
   esp_err_t err;
 
   // Set up I2S Processor configuration
-  const i2s_config_t i2s_config = {
+  const i2s_config_t i2s_config_mems = {
       .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
       .sample_rate = SAMPLING_FREQUENCY,
       .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
@@ -24,11 +25,14 @@ void setup_i2s() {
       .dma_buf_len = NB_SAMPLES,
       .use_apll = false};
 
-  err = i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
-  if (err != ESP_OK) {
+  err = i2s_driver_install(I2S_PORT, &i2s_config_mems, 0, NULL);
+  if (err != ESP_OK)
+  {
     Serial.print("Error while installing I2S drivers : ");
     Serial.println(err);
-  } else {
+  }
+  else
+  {
     Serial.println("I2S drivers correctly installed");
   }
 
@@ -39,29 +43,32 @@ void setup_i2s() {
                                        .data_in_num = I2S_SD};
 
   err = i2s_set_pin(I2S_PORT, &pin_config);
-  if (err != ESP_OK) {
+  if (err != ESP_OK)
+  {
     Serial.print("Error setting I2S pins : ");
     Serial.println(err);
-  } else {
+  }
+  else
+  {
     Serial.println("I2S pins correctly configured");
   }
 }
 
-
-int readSampledData() {
+int readSampledData()
+{
   size_t readBytes = 0;
   esp_err_t result = i2s_read(I2S_PORT, &readBuffer, sizeof(readBuffer),
                               &readBytes, portMAX_DELAY);
-  if (readBytes != sizeof(readBuffer)) {
+  if (readBytes != sizeof(readBuffer))
+  {
     Serial.printf("Could only read %u bytes of %u in FillBufferI2S()\n",
                   readBytes, sizeof(readBuffer));
     // return;
   }
 
-  int readSamples = readBytes / sizeof(int16_t);  // 16 bit per sample
+  int readSamples = readBytes / sizeof(int16_t); // 16 bit per sample
 
   return readSamples;
 }
-
 
 #endif /*   I2S_SETTINGS_H    */

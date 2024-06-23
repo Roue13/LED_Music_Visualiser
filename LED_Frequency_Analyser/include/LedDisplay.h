@@ -6,6 +6,7 @@
 #include <FastLED_NeoMatrix.h>
 #include <SPI.h>
 #include <Wire.h>
+#include "LedMatrix.h"
 
 CRGB leds[NUM_BANDS * NUM_LEDS_PER_BAND];
 
@@ -61,7 +62,7 @@ void drawBandsHeights()
   {
     for (int y = 0; y <= bandValues[x]; y++)
     {
-      matrix->drawPixel(x, y, ColorFromPalette(pinkRedPal, constrain(bandValues[y] * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
+      matrix->drawPixel(x, y, ColorFromPalette(cyanBluePal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
     }
   }
 }

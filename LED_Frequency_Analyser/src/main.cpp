@@ -11,7 +11,7 @@ void setup()
   Serial.begin(115200);
   Serial.println("***** Starting setup *****");
 
-  setup_i2s();
+  setup_i2s_MEMS();
   initDisplay();
 
   Serial.println("***** Setup finished *****");
