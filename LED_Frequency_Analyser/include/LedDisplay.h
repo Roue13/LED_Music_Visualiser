@@ -55,13 +55,28 @@ void processBands()
   }
 }
 
-void drawBandsHeights()
+void drawBandsHeights(uint8_t mode)
 {
-  for (int8_t x = 0; x < NUM_BANDS; x++)
+  if (mode == 0) // Normal
   {
-    for (int y = 0; y <= bandValues[x]; y++)
+    for (int8_t x = 0; x < NUM_BANDS; x++)
     {
-      matrix->drawPixel(x, y, ColorFromPalette(BGRPal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
+      for (int y = 0; y <= bandValues[x]; y++)
+      {
+        matrix->drawPixel(x, y, ColorFromPalette(BGRPal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
+      }
+    }
+  }
+  else // Fading mode
+  {
+    for (int8_t band = 0; band < NUM_BANDS; band++)
+    {
+      for (int y = 0; y < NUM_LEDS_PER_BAND; y++)
+      {
+        uint8_t color = (float)((float)band / (float)NUM_BANDS) * (float)255;
+        uint8_t value = (int)((float)bandValues[band] * ((float)255 / (float)NUM_LEDS_PER_BAND));
+        matrix->drawPixel(band, y, CHSV(color, 255, value)); // Change color here
+      }
     }
   }
 }

@@ -11,17 +11,17 @@
 #define SAMPLING_FREQUENCY 48000
 #define NB_SAMPLES 1024 // Between 8 and 1024
 #define NB_DMA_BUFFERS 4
-#define LOW_FREQUENCY 100    // Lowest frequency in Hz
+#define LOW_FREQUENCY 80     // Lowest frequency in Hz
 #define HIGH_FREQUENCY 10000 // Highest frequency in Hz
 
 /***** LED Display Parameters *****/
 #define NUM_BANDS 12
 #define NUM_LEDS_PER_BAND 12
-#define BRIGHTNESS 180
-#define MAX_CURRENT_MA 4000
+#define BRIGHTNESS 150
+#define MAX_CURRENT_MA 3500
 
-#define AVERAGE_FACTOR 50 // Between 0 (soft) and 100 (reactive) --> 70 just in the middle
+#define AVERAGE_FACTOR 60 // Between 0 (soft) and 100 (reactive) --> 70 just in the middle
 #define AMPLITUDE 15000   // Bigger = More attenuation
-#define PEAK_DECAY_SPEED 60
+#define PEAK_DECAY_SPEED 90
 
 #endif /*   SETTINGS_H    */
