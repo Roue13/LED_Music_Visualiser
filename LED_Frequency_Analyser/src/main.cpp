@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include <math.h>
+
+#define DEBUG 0
 
 #include "Settings.h"
 #include "LedDisplay.h"
@@ -8,14 +11,19 @@
 
 void setup()
 {
+#if DEBUG
   Serial.begin(115200);
   Serial.println("***** Starting setup *****");
+#endif
 
   setup_i2s_MEMS();
   initDisplay();
+  initFreqBands();
 
+#if DEBUG
   Serial.println("***** Setup finished *****");
   delay(1000);
+#endif
 }
 
 void loop()

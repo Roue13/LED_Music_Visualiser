@@ -1,6 +1,7 @@
 #ifndef LEDDISPLAY_H
 #define LEDDISPLAY_H
 
+#define FASTLED_INTERNAL // Used to disable FastLED #pragma Warnings
 #include <Adafruit_GFX.h>
 #include <FastLED.h>
 #include <FastLED_NeoMatrix.h>
@@ -40,9 +41,7 @@ void processBands()
     }
 
     // Averaging / Smoothing Bands Heights
-    barHeight = ((oldBandValues[band] * (100 - AVERAGE_FACTOR)) +
-                 (barHeight * AVERAGE_FACTOR)) /
-                100;
+    barHeight = ((oldBandValues[band] * (100 - AVERAGE_FACTOR)) + (barHeight * AVERAGE_FACTOR)) / 100;
 
     // Assign New / Old values
     oldBandValues[band] = barHeight;

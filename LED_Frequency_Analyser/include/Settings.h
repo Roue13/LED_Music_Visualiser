@@ -10,6 +10,8 @@
 /***** Data Processing Parameters *****/
 #define SAMPLING_FREQUENCY 48000
 #define NB_SAMPLES 1024
+#define LOW_FREQUENCY 100    // Lowest frequency in Hz
+#define HIGH_FREQUENCY 12000 // Highest frequency in Hz
 
 /***** LED Display Parameters *****/
 #define NUM_BANDS 12
