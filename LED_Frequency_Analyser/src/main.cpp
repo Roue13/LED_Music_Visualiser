@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <math.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 #include "Settings.h"
 #include "LedDisplay.h"

@@ -6,9 +6,15 @@ DEFINE_GRADIENT_PALETTE(pink_red_gp){
     255, 255, 0, 0    // Red
 };
 
-DEFINE_GRADIENT_PALETTE(cyan_blue_gp){
-    0, 0, 255, 255, // Cyan
-    255, 0, 0, 150  // Dark Blue
+DEFINE_GRADIENT_PALETTE(blue_gp){
+    0, 0, 0, 255,  // Cyan
+    255, 0, 0, 100 // Dark Blue
+};
+
+DEFINE_GRADIENT_PALETTE(bgr_gp){
+    0, 0, 0, 255,  // Blue
+    80, 0, 255, 0, // Green
+    220, 255, 0, 0 // Red
 };
 
 DEFINE_GRADIENT_PALETTE(lightYellow_Green_gp){
@@ -17,7 +23,8 @@ DEFINE_GRADIENT_PALETTE(lightYellow_Green_gp){
 };
 
 CRGBPalette16 pinkRedPal = pink_red_gp;
-CRGBPalette16 cyanBluePal = cyan_blue_gp;
+CRGBPalette16 BluePal = blue_gp;
+CRGBPalette16 BGRPal = bgr_gp;
 CRGBPalette16 yellowGreenPal = lightYellow_Green_gp;
 
 #endif /*   LEDMATRIX_H     */

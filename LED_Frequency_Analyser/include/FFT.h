@@ -119,7 +119,7 @@ void assignFreqBinsValues()
     {
       if (band == 0)
       {
-        if (i <= lowFreqBin[band])
+        if (i <= highFreqBin[band])
           bandValues[band] += (int)vReal[i];
       }
       else

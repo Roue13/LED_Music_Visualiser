@@ -21,7 +21,7 @@ void setup_i2s_MEMS()
       .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
       .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
       .intr_alloc_flags = 0,
-      .dma_buf_count = 2,
+      .dma_buf_count = NB_DMA_BUFFERS,
       .dma_buf_len = NB_SAMPLES,
       .use_apll = false};
 

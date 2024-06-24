@@ -61,7 +61,7 @@ void drawBandsHeights()
   {
     for (int y = 0; y <= bandValues[x]; y++)
     {
-      matrix->drawPixel(x, y, ColorFromPalette(cyanBluePal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
+      matrix->drawPixel(x, y, ColorFromPalette(BGRPal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
     }
   }
 }
@@ -70,7 +70,7 @@ void drawPeaks()
 {
   for (int8_t band = 0; band < NUM_BANDS; band++)
   {
-    matrix->drawPixel(band, bandPeaks[band], CHSV(0, 255, 255)); // White Peaks
+    matrix->drawPixel(band, bandPeaks[band], CHSV(0, 0, 255)); // White Peaks
   }
 }
 
