@@ -1,13 +1,13 @@
+// Theme : Atom One Dark ("Atom One Dark Theme" Extension)
+
 #include <Arduino.h>
 #include <math.h>
 
-#define DEBUG 1
-
+//#define FASTLED_INTERNAL // Used to disable FastLED #pragma Warnings
 #include "Settings.h"
-#include "LedDisplay.h"
-#include "LedMatrix.h"
-#include "FFT.h"
-#include "I2S_Settings.h"
+#include "Setup.h"
+#include "Calculations.h"
+#include "Display.h"
 
 void setup()
 {
@@ -18,7 +18,7 @@ void setup()
 
   setup_i2s_MEMS();
   initDisplay();
-  initFreqBands();
+  initVariables();
 
 #if DEBUG
   Serial.println("***** Setup finished *****");

@@ -1,6 +1,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#define DEBUG 0
+
 /***** PINS connections *****/
 #define I2S_WS 25       // WS pin
 #define I2S_SD 33       // SD pin
@@ -18,7 +20,9 @@
 #define NUM_BANDS 12
 #define NUM_LEDS_PER_BAND 12
 #define BRIGHTNESS 150
-#define MAX_CURRENT_MA 3500
+#define LED_STRIP_TYPE WS2812B
+#define LED_STRIP_VOLTAGE 5
+#define LED_STRIP_MAX_CURRENT 3500
 
 #define AVERAGE_FACTOR 60 // Between 0 (soft) and 100 (reactive) --> 70 just in the middle
 #define AMPLITUDE 15000   // Bigger = More attenuation
