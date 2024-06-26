@@ -69,6 +69,27 @@ void processBands()
     }
 }
 
+void processBandsV2()
+{
+    for (uint8_t band = 0; band < NUM_BANDS; band++)
+    {
+        // Process Bands Height
+        int maxMeasureValue = 255 * NUM_LEDS_PER_BAND;
+        int barHeight = bandValues[band] / (AMPLITUDE / maxMeasureValue);
+        if (barHeight > maxMeasureValue)
+        {
+            barHeight = maxMeasureValue;
+        }
+
+        bandValues[band] = barHeight;
+
+        /*Serial.print("band : ");
+        Serial.print(band + 1);
+        Serial.print("  ->  ");
+        Serial.println(barHeight);*/
+    }
+}
+
 void drawBandsHeights(uint8_t mode)
 {
     if (mode == 0) // Normal
@@ -91,6 +112,23 @@ void drawBandsHeights(uint8_t mode)
                 uint8_t value = (int)((float)bandValues[band] * ((float)255 / (float)NUM_LEDS_PER_BAND));
                 matrix->drawPixel(band, y, CHSV(color, 255, value)); // Change color here
             }
+        }
+    }
+}
+
+void drawBandsHeightsV2(uint8_t mode)
+{
+    for (int8_t band = 0; band < NUM_BANDS; band++)
+    {
+        uint8_t highLED = ((bandValues[band] - (bandValues[band]) % 255) / 255);
+        for (int led = 0; led < highLED; led++)
+        {
+            matrix->drawPixel(band, led, CHSV(255, 255, 255)); // Full RED
+        }
+        matrix->drawPixel(band, highLED, CHSV(255, 255, bandValues[band] % 255)); // Change color here
+        for (int led = highLED + 1; led < NUM_LEDS_PER_BAND; led++)
+        {
+            matrix->drawPixel(band, led, CHSV(150, 255, 255)); // OFF
         }
     }
 }

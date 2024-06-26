@@ -1,6 +1,7 @@
 #include "Setup.h"
 #include "Calculations.h"
 
+#define MAX_RAW_MEASURE 500000
 double vReal[NB_SAMPLES];
 double vImag[NB_SAMPLES];
 ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, NB_SAMPLES, SAMPLING_FREQUENCY);

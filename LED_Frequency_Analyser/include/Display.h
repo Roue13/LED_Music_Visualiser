@@ -13,7 +13,11 @@ void initDisplay(void);
 
 void processBands(void);
 
+void processBandsV2(void);
+
 void drawBandsHeights(uint8_t);
+
+void drawBandsHeightsV2(uint8_t);
 
 void drawPeaks(void);
 

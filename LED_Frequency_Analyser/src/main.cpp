@@ -38,13 +38,13 @@ void loop()
 
   computeFFT();           // Applies all FFT calculations
   assignFreqBinsValues(); // Gets values for frequency bands
-  processBands();         // Assign new band heights and peaks values
-  drawBandsHeights(0);    // Draw new band heights values (0 = normal, 1 = fading)
-  drawPeaks();            // Draw new band peaks   values
+  processBandsV2();       // Assign new band heights and peaks values
+  drawBandsHeightsV2(0);  // Draw new band heights values (0 = normal, 1 = fading)
+  /*drawPeaks();            // Draw new band peaks   values
   EVERY_N_MILLISECONDS(PEAK_DECAY_SPEED)
   {
     peaksDecay();
-  }
+  }*/
 
   FastLED.show();
 }
