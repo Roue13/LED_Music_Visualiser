@@ -19,13 +19,13 @@
 /***** LED Display Parameters *****/
 #define NUM_BANDS 12
 #define NUM_LEDS_PER_BAND 12
-#define BRIGHTNESS 150
+#define BRIGHTNESS 80
 #define LED_STRIP_TYPE WS2812B
 #define LED_STRIP_VOLTAGE 5
 #define LED_STRIP_MAX_CURRENT 3500
 
-#define AVERAGE_FACTOR 60 // Between 0 (soft) and 100 (reactive) --> 70 just in the middle
+#define AVERAGE_FACTOR 65 // Between 0 (soft) and 100 (reactive) --> 70 just in the middle
 #define AMPLITUDE 15000   // Bigger = More attenuation
-#define PEAK_DECAY_SPEED 90
+#define PEAK_DECAY_SPEED 50
 
 #endif /*   SETTINGS_H    */

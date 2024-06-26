@@ -3,7 +3,6 @@
 #include <Arduino.h>
 #include <math.h>
 
-//#define FASTLED_INTERNAL // Used to disable FastLED #pragma Warnings
 #include "Settings.h"
 #include "Setup.h"
 #include "Calculations.h"

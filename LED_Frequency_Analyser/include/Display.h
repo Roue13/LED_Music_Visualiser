@@ -3,7 +3,6 @@
 
 #include "Settings.h"
 #include <Adafruit_GFX.h>
-#define FASTLED_INTERNAL
 #include <FastLED.h>
 #include <FastLED_NeoMatrix.h>
 #include <SPI.h>
