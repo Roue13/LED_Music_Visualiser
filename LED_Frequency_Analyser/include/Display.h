@@ -8,19 +8,42 @@
 #include <SPI.h>
 #include <Wire.h>
 
-/* Functions */
+/*  Initialise led strip parameters and characteristics  */
 void initDisplay(void);
 
-void processBands(void);
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+/* %%%%%%%%%%%%%%%%%%%% RAW CALCULATION / DISPLAY %%%%%%%%%%%%%%%%%%%% */
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
-void processBandsV2(void);
+/*  Calculations between sampling and display.
+    Outpout led values are 0 or 255 (OFF - ON)  */
+void processBandsRaw(void);
 
-void drawBandsHeights(uint8_t);
+/*  Display raw calculated led values.
+    Each led can be ON or OFF without smoothing or transitions  */
+void drawBandsHeightsRaw();
 
-void drawBandsHeightsV2(uint8_t);
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+/* %%%%%%%%%%%%%%%%%%%% Full CALCULATION / DISPLAY %%%%%%%%%%%%%%%%%%%% */
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+
+/*  Calculations between sampling and display.
+    Outpout led values are between 0 and 255 (smoother display) */
+void processBandsFull(void);
+
+/*  Display full calculated led values.
+    Trailing 1 --> The higher led of each band smoothly fade out */
+void drawBandsHeightsT1();
+
+/*  Display full calculated led values.
+    Trailing 3 --> The 3 higher leds of each band smoothly fade out */
+void drawBandsHeightsT3();
+
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+/* %%%%%%%%%%%%%%%%%%%% Full CALCULATION / DISPLAY %%%%%%%%%%%%%%%%%%%% */
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
 void drawPeaks(void);
-
 void peaksDecay(void);
 
 #endif /* DISPLAY_H */

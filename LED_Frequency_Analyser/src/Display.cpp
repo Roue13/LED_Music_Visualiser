@@ -40,15 +40,16 @@ void initDisplay()
     FastLED.setMaxPowerInVoltsAndMilliamps(LED_STRIP_VOLTAGE, LED_STRIP_MAX_CURRENT);
     FastLED.setBrightness(BRIGHTNESS);
     FastLED.clear();
+    fill_solid(leds, TOTAL_LEDS, CRGB::Black);
     FastLED.show();
 }
 
-void processBands()
+void processBandsRaw()
 {
     for (uint8_t band = 0; band < NUM_BANDS; band++)
     {
         // Process Bands Height
-        int barHeight = bandValues[band] / AMPLITUDE;
+        int barHeight = bandValues[band] / AMPLITUDE_RAW;
         if (barHeight > NUM_LEDS_PER_BAND)
         {
             barHeight = NUM_LEDS_PER_BAND;
@@ -69,66 +70,111 @@ void processBands()
     }
 }
 
-void processBandsV2()
+void drawBandsHeightsRaw()
 {
+    for (int8_t x = 0; x < NUM_BANDS; x++)
+    {
+        for (int y = 0; y <= bandValues[x]; y++)
+        {
+            matrix->drawPixel(x, y, ColorFromPalette(BGRPal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
+        }
+    }
+}
+
+void processBandsFull()
+{
+    int maxMeasureValue = 255 * NUM_LEDS_PER_BAND;
+
     for (uint8_t band = 0; band < NUM_BANDS; band++)
     {
         // Process Bands Height
-        int maxMeasureValue = 255 * NUM_LEDS_PER_BAND;
-        int barHeight = bandValues[band] / (AMPLITUDE / maxMeasureValue);
+        int barHeight = bandValues[band] / AMPLITUDE_TRAILING;
         if (barHeight > maxMeasureValue)
         {
             barHeight = maxMeasureValue;
         }
 
+        barHeight = ((oldBandValues[band] * (100 - AVERAGE_FACTOR)) + (barHeight * AVERAGE_FACTOR)) / 100;
+
+        oldBandValues[band] = barHeight;
         bandValues[band] = barHeight;
-
-        /*Serial.print("band : ");
-        Serial.print(band + 1);
-        Serial.print("  ->  ");
-        Serial.println(barHeight);*/
     }
 }
 
-void drawBandsHeights(uint8_t mode)
-{
-    if (mode == 0) // Normal
-    {
-        for (int8_t x = 0; x < NUM_BANDS; x++)
-        {
-            for (int y = 0; y <= bandValues[x]; y++)
-            {
-                matrix->drawPixel(x, y, ColorFromPalette(BGRPal, constrain(y * (255 / NUM_LEDS_PER_BAND), 0, 255))); // Change color here
-            }
-        }
-    }
-    else // Fading mode
-    {
-        for (int8_t band = 0; band < NUM_BANDS; band++)
-        {
-            for (int y = 0; y < NUM_LEDS_PER_BAND; y++)
-            {
-                uint8_t color = (float)((float)band / (float)NUM_BANDS) * (float)255;
-                uint8_t value = (int)((float)bandValues[band] * ((float)255 / (float)NUM_LEDS_PER_BAND));
-                matrix->drawPixel(band, y, CHSV(color, 255, value)); // Change color here
-            }
-        }
-    }
-}
-
-void drawBandsHeightsV2(uint8_t mode)
+void drawBandsHeightsT1()
 {
     for (int8_t band = 0; band < NUM_BANDS; band++)
     {
-        uint8_t highLED = ((bandValues[band] - (bandValues[band]) % 255) / 255);
-        for (int led = 0; led < highLED; led++)
+        // 3 variables for position of the leds (between 0 and NUM_LEDS_PER_BAND)
+        uint8_t lastLed = min(((bandValues[band] - (bandValues[band]) % 255) / 255), NUM_LEDS_PER_BAND);
+
+        for (int led = 0; led < NUM_LEDS_PER_BAND; led++)
         {
-            matrix->drawPixel(band, led, CHSV(255, 255, 255)); // Full RED
+            uint8_t color = min((led * 255) / NUM_LEDS_PER_BAND, 255);
+            int lumLastLed = (bandValues[band] % 255) * (float)(35.0 / 100.0);
+
+            // Actualise led values
+            if (led < lastLed)
+            {
+                matrix->drawPixel(band, led, ColorFromPalette(BGRPal, color, 255)); // Full RED
+            }
+            else if (led == lastLed)
+            {
+                matrix->drawPixel(band, led, ColorFromPalette(BGRPal, color, lumLastLed)); // Change color here
+            }
+            else
+            {
+                matrix->drawPixel(band, led, CHSV(0, 0, 0));
+            }
         }
-        matrix->drawPixel(band, highLED, CHSV(255, 255, bandValues[band] % 255)); // Change color here
-        for (int led = highLED + 1; led < NUM_LEDS_PER_BAND; led++)
+    }
+}
+
+void drawBandsHeightsT3()
+{
+    for (int8_t band = 0; band < NUM_BANDS; band++)
+    {
+        // 3 variables for position of the leds (between 0 and NUM_LEDS_PER_BAND)
+        uint8_t lastLed = min(((bandValues[band] - (bandValues[band]) % 255) / 255), NUM_LEDS_PER_BAND - 1);
+        uint8_t lastLedBefore = max(lastLed - 1, 0);
+        uint8_t lastLedAfter = lastLed + 1;
+
+        for (int led = 0; led < NUM_LEDS_PER_BAND; led++)
         {
-            matrix->drawPixel(band, led, CHSV(150, 255, 255)); // OFF
+            uint8_t color = min((led * 255) / NUM_LEDS_PER_BAND, 255);
+
+            // Variables for intensity of the leds (between 0 and 255)
+            int lumToShare = 255 + (bandValues[band] % 255); // One full led (lastLedBefore) + the rest
+
+            /*int lumLastLedBefore = lumToShare * (float)((float)T3_FACTOR_1ST / 100.0);
+            int lumLastLed = lumToShare * (float)((float)T3_FACTOR_2ND / 100.0);
+            int lumLastLedAfter = lumToShare * (float)((float)T3_FACTOR_3RD / 100.0);*/
+
+            int lumLastLedBefore = lumToShare * (float)(60.0 / 100.0);
+            int lumLastLed = lumToShare * (float)(25.0 / 100.0);
+            int lumLastLedAfter = lumToShare * (float)(15.0 / 100.0);
+
+            // Actualise led values
+            if (led < lastLedBefore)
+            {
+                matrix->drawPixel(band, led, ColorFromPalette(BGRPal, color, 255)); // Full RED
+            }
+            else if (led == lastLedBefore)
+            {
+                matrix->drawPixel(band, led, ColorFromPalette(BGRPal, color, lumLastLedBefore)); // Change color here
+            }
+            else if (led == lastLed)
+            {
+                matrix->drawPixel(band, led, ColorFromPalette(BGRPal, color, lumLastLed)); // Change color here
+            }
+            else if (led == lastLedAfter)
+            {
+                matrix->drawPixel(band, led, ColorFromPalette(BGRPal, color, lumLastLedAfter)); // Change color here
+            }
+            else
+            {
+                matrix->drawPixel(band, led, CHSV(0, 0, 0));
+            }
         }
     }
 }
