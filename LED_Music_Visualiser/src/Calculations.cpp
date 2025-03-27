@@ -1,11 +1,13 @@
 #include "Setup.h"
 #include "Calculations.h"
 
-#define MAX_RAW_MEASURE 500000
+/***** Variables and instances *****/
+// For the FFT Library
 double vReal[NB_SAMPLES];
 double vImag[NB_SAMPLES];
 ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, NB_SAMPLES, SAMPLING_FREQUENCY);
 
+// Other
 const double freqMultiplierPerBand = pow((double)(HIGH_FREQUENCY / LOW_FREQUENCY), 1 / (double)(NUM_BANDS - 1));
 const double binWidth = (double)SAMPLING_FREQUENCY / (double)NB_SAMPLES;
 const double nbUsableBins = (NB_SAMPLES / 2) - 1;
@@ -13,6 +15,8 @@ int centerFreqBand[NUM_BANDS + 1];
 int centerFreqBin[NUM_BANDS + 1];
 int lowFreqBin[NUM_BANDS];
 int highFreqBin[NUM_BANDS];
+
+/***** Variables and instances *****/
 
 void initVariables()
 {

@@ -1,13 +1,13 @@
-// Theme : Atom One Dark ("Atom One Dark Theme" Extension)
 
+/***** Files and Libraries *****/
 #include <Arduino.h>
 #include <math.h>
-
 #include "Settings.h"
-#include "Setup.h"
+#include "AudioData.h"
 #include "Calculations.h"
 #include "Display.h"
 
+/***** SETUP *****/
 void setup()
 {
 #if DEBUG
@@ -15,7 +15,7 @@ void setup()
   Serial.println("***** Starting setup *****");
 #endif
 
-  setup_i2s_MEMS();
+  setupI2sMicrophone();
   initDisplay();
   initVariables();
 
@@ -25,10 +25,11 @@ void setup()
 #endif
 }
 
+/***** MAIN LOOP *****/
 void loop()
 {
   FastLED.clear();
-  int readSamples = readSampledData(); // Gets data from DMA buffers
+  int readSamples = readAudioSamples(); // Gets data from DMA buffers
 
   for (int i = 0; i < readSamples; i++) //
   {

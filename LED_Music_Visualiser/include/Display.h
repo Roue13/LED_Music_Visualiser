@@ -1,6 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+/***** Files and Libraries *****/
 #include "Settings.h"
 #include <Adafruit_GFX.h>
 #include <FastLED.h>
@@ -11,9 +12,7 @@
 /*  Initialise led strip parameters and characteristics  */
 void initDisplay(void);
 
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 /* %%%%%%%%%%%%%%%%%%%% RAW CALCULATION / DISPLAY %%%%%%%%%%%%%%%%%%%% */
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
 /*  Calculations between sampling and display.
     Outpout led values are 0 or 255 (OFF - ON)  */
@@ -23,9 +22,7 @@ void processBandsRaw(void);
     Each led can be ON or OFF without smoothing or transitions  */
 void drawBandsHeightsRaw();
 
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 /* %%%%%%%%%%%%%%%%%%%% Full CALCULATION / DISPLAY %%%%%%%%%%%%%%%%%%%% */
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
 /*  Calculations between sampling and display.
     Outpout led values are between 0 and 255 (smoother display) */
@@ -39,10 +36,7 @@ void drawBandsHeightsT1();
     Trailing 3 --> The 3 higher leds of each band smoothly fade out */
 void drawBandsHeightsT3();
 
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 /* %%%%%%%%%%%%%%%%%%%% Full CALCULATION / DISPLAY %%%%%%%%%%%%%%%%%%%% */
-/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-
 void drawPeaks(void);
 void peaksDecay(void);
 
