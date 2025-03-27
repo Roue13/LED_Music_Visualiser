@@ -3,6 +3,7 @@
 
 /***** Files and Libraries *****/
 #include <Arduino.h>
+#include <algorithm>
 #include <driver/i2s.h>
 #include <driver/adc.h>
 #include "BluetoothA2DPSink.h"
@@ -17,10 +18,12 @@ extern int bandPeaks[NUM_BANDS];
 
 /***** Functions prototypes *****/
 
+void readDataStream(const uint8_t, uint32_t);
+int readDataMicrophone(void);
+int readDataBluetooth(void);
+int readAudioSamples(void);
 void setupI2sMicrophone(void);
 void setupI2sBluetooth(void);
-int readDataMicrophone(void);
-void readDataStream(const uint8_t, uint32_t);
-int readAudioSamples(void);
+void setupI2sAudio(void);
 
 #endif /* AUDIODATA_H */

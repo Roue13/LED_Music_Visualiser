@@ -8,20 +8,20 @@
 #define I2S_SD 33       // SD pin
 #define I2S_SCK 32      // SCK pin
 #define LED_DATA_PIN 23 // Led strips DATA pin
-#define BTN_MODE_PIN 39 // Button used to switch between audio input modes
+#define BTN_MODE_PIN 27 // Button used to switch between audio input modes
 
 /***** Bluetooth Parameters *****/
 #define MODE_MICROPHONE 0                     // Microphone audio input mode
 #define MODE_BLUETOOTH 1                      // Bluetooth audio input mode
-#define AUDIO_MODE MODE_MICROPHONE            // Audio mode to use when starting
+#define AUDIO_MODE MODE_BLUETOOTH             // Audio mode to use when starting
 #define BT_DEVICE_NAME "LED Music Visualiser" // Name shown when looking for the ESP32 Bluetooth device
 
 /***** Data Processing Parameters *****/
-#define SAMPLING_FREQUENCY 48000
-#define NB_SAMPLES 1024     // Between 8 and 1024
-#define NB_DMA_BUFFERS 2    // Between 2 and ??? 128 ???
-#define LOW_FREQUENCY 80    // Lowest frequency in Hz
-#define HIGH_FREQUENCY 8000 // Highest frequency in Hz
+#define SAMPLING_FREQUENCY 72000
+#define NB_SAMPLES 1024   // Between 8 and 1024
+#define NB_DMA_BUFFERS 32 // Between 2 and ??? 128 ???
+// #define LOW_FREQUENCY 50     // Lowest frequency in Hz
+#define HIGH_FREQUENCY 16000 // Highest frequency in Hz
 
 /***** LED Setup Parameters *****/
 #define NUM_BANDS 12         // Number of columns
@@ -33,7 +33,7 @@
 #define LED_STRIP_MAX_CURRENT 3500 // Max power source current (in mA)
 
 /***** LED Visuals Parameters *****/
-#define AVERAGE_FACTOR 60     // Between 0 (soft) and 100 (reactive)
+#define AVERAGE_FACTOR 55     // Between 0 (soft) and 100 (reactive)
 #define AMPLITUDE_RAW 15000   // Bigger = More attenuation
 #define AMPLITUDE_TRAILING 70 // Bigger = More attenuation
 #define PEAK_DECAY_SPEED 60   // Time in ms between each fade out sweep

@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "AudioData.h"
 #include "Calculations.h"
 
 /***** Variables and instances *****/
@@ -8,8 +8,9 @@ double vImag[NB_SAMPLES];
 ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, NB_SAMPLES, SAMPLING_FREQUENCY);
 
 // Other
-const double freqMultiplierPerBand = pow((double)(HIGH_FREQUENCY / LOW_FREQUENCY), 1 / (double)(NUM_BANDS - 1));
 const double binWidth = (double)SAMPLING_FREQUENCY / (double)NB_SAMPLES;
+const int LOW_FREQUENCY = (int)binWidth;
+const double freqMultiplierPerBand = pow((double)(HIGH_FREQUENCY / LOW_FREQUENCY), 1 / (double)(NUM_BANDS - 1));
 const double nbUsableBins = (NB_SAMPLES / 2) - 1;
 int centerFreqBand[NUM_BANDS + 1];
 int centerFreqBin[NUM_BANDS + 1];
@@ -117,6 +118,7 @@ void computeFFT()
     FFT.windowing(FFT_WIN_TYP_HAMMING, FFT_FORWARD);
     FFT.compute(FFT_FORWARD);
     FFT.complexToMagnitude();
+    // Serial.printf("\nMax freq : %f Hz", FFT.majorPeak());
 }
 
 void assignFreqBinsValues()

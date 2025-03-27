@@ -1,5 +1,5 @@
 #include "Display.h"
-#include "Setup.h"
+#include "AudioData.h"
 
 /* LED and MATRIX objects */
 CRGB leds[NUM_BANDS * NUM_LEDS_PER_BAND];

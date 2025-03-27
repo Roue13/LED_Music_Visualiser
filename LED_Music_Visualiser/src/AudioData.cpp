@@ -5,8 +5,65 @@ int oldBandValues[NUM_BANDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int bandValues[NUM_BANDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int bandPeaks[NUM_BANDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 BluetoothA2DPSink a2dp_sink;
-int16_t bluetoothBuffer[1024];  // Bluetooth Data Buffer
-size_t bluetoothDataLength = 0; // Length of Bluetooth data
+int bluetoothDataLength = 0; // Length of Bluetooth data
+
+void readDataStream(const uint8_t *data, uint32_t length)
+{
+    int16_t *values = (int16_t *)data;
+    int samples = length / sizeof(int16_t); // Nombre d'échantillons reçus
+
+    // Limiter la quantité de données stockées
+    bluetoothDataLength = std::min(samples, NB_SAMPLES);
+
+    // Copier les données reçues dans le buffer global
+    memcpy(readBuffer, values, bluetoothDataLength * sizeof(int16_t));
+
+#if DEBUG
+    Serial.printf("Bluetooth Data Received: %u samples\n", bluetoothDataLength);
+    for (size_t i = 0; i < bluetoothDataLength; i += 2)
+    {
+        Serial.printf("L: %d, R: %d\n", readBuffer[i], readBuffer[i + 1]);
+    }
+#endif
+}
+
+int readDataMicrophone()
+{
+    size_t readBytes = 0;
+    esp_err_t result = i2s_read(I2S_PORT, &readBuffer, sizeof(readBuffer), &readBytes, portMAX_DELAY);
+#if DEBUG
+    if (readBytes != sizeof(readBuffer))
+    {
+        Serial.printf("Could only read %u bytes of %u in FillBufferI2S()\n",
+                      readBytes, sizeof(readBuffer));
+        // return;
+    }
+#endif
+
+    int readSamples = readBytes / sizeof(int16_t); // 16 bit per sample
+    return readSamples;
+}
+
+int readDataBluetooth()
+{
+    return bluetoothDataLength;
+}
+
+int readAudioSamples(void)
+{
+    int readSamples = 0;
+
+    if (AUDIO_MODE == MODE_MICROPHONE)
+    {
+        readSamples = readDataMicrophone();
+    }
+    else if (AUDIO_MODE == MODE_BLUETOOTH)
+    {
+        readSamples = readDataBluetooth();
+    }
+
+    return readSamples;
+}
 
 void setupI2sMicrophone()
 {
@@ -59,59 +116,40 @@ void setupI2sMicrophone()
 
 void setupI2sBluetooth()
 {
+    const i2s_config_t i2s_config_bluetooth = {
+        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+        .sample_rate = SAMPLING_FREQUENCY,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+        .intr_alloc_flags = 0,
+        .dma_buf_count = NB_DMA_BUFFERS,
+        .dma_buf_len = NB_SAMPLES,
+        .use_apll = false};
+
+    // 🔹 Installe le driver I2S
+    i2s_driver_install(I2S_PORT, &i2s_config_bluetooth, 0, NULL);
+
+    // 🔹 Configure les broches I2S (remplace par tes broches si nécessaire)
+    const i2s_pin_config_t pin_config = {
+        .bck_io_num = I2S_SCK,
+        .ws_io_num = I2S_WS,
+        .data_out_num = I2S_SD};
+
+    i2s_set_pin(I2S_PORT, &pin_config);
+
     a2dp_sink.set_stream_reader(readDataStream);
     a2dp_sink.start(BT_DEVICE_NAME);
 }
 
-int readDataMicrophone()
+void setupI2sAudio()
 {
-    size_t readBytes = 0;
-    esp_err_t result = i2s_read(I2S_PORT, &readBuffer, sizeof(readBuffer), &readBytes, portMAX_DELAY);
-#if DEBUG
-    if (readBytes != sizeof(readBuffer))
-    {
-        Serial.printf("Could only read %u bytes of %u in FillBufferI2S()\n",
-                      readBytes, sizeof(readBuffer));
-        // return;
-    }
-#endif
-
-    int readSamples = readBytes / sizeof(int16_t); // 16 bit per sample
-    return readSamples;
-}
-
-int readDataBluetooth()
-{
-    return bluetoothDataLength;
-}
-
-void readDataStream(const uint8_t *data, uint32_t length)
-{
-    // Process all data
-    int16_t *values = (int16_t *)data;
-    for (int j = 0; j < length / 2; j += 2)
-    {
-#if DEBUG
-        // Print the 2 channel values
-        Serial.print(values[j]);
-        Serial.print(",");
-        Serial.println(values[j + 1]);
-#endif
-    }
-}
-
-int readAudioSamples(void)
-{
-    int readSamples = 0;
-
     if (AUDIO_MODE == MODE_MICROPHONE)
     {
-        readSamples = readDataMicrophone();
+        setupI2sMicrophone();
     }
     else if (AUDIO_MODE == MODE_BLUETOOTH)
     {
-        readSamples = readDataBluetooth();
+        setupI2sBluetooth();
     }
-
-    return readSamples;
 }
