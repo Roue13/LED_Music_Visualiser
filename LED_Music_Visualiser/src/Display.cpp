@@ -1,5 +1,6 @@
 #include "Display.h"
-#include "AudioData.h"
+#include "Global.h"
+#include <Fonts/FreeMono12pt7b.h> // How to use fonts : https://learn.adafruit.com/adafruit-gfx-graphics-library/using-fonts
 
 /* LED and MATRIX objects */
 CRGB leds[NUM_BANDS * NUM_LEDS_PER_BAND];
@@ -72,7 +73,7 @@ void processBandsRaw()
 
 void drawBandsHeightsRaw()
 {
-    for (int8_t x = 0; x < NUM_BANDS; x++)
+    for (int x = 0; x < NUM_BANDS; x++)
     {
         for (int y = 0; y <= bandValues[x]; y++)
         {
@@ -194,4 +195,49 @@ void peaksDecay()
         if (bandPeaks[band] > 0)
             bandPeaks[band] -= 1;
     }
+}
+
+void drawConnectionState(esp_a2d_connection_state_t state)
+{
+    FastLED.clear();
+
+    // Displayed text parameters
+    matrix->setTextWrap(false); // Wrap -> Text starts on a new line when finishing the actual one
+    matrix->setTextSize(2);
+    matrix->setFont(&FreeMono12pt7b);
+
+    // Color parameters according to the connection state
+    int8_t color = 0;    // Top and bottom lines color
+    std::string message; // Displayed word
+    switch (state)
+    {
+    case ESP_A2D_CONNECTION_STATE_CONNECTED:
+        color = 96;                                     // Green
+        matrix->setTextColor(matrix->Color(0, 255, 0)); // Green
+        message = "Connected";
+        break;
+    case ESP_A2D_CONNECTION_STATE_CONNECTING:
+        color = 64;                                       // Yellow
+        matrix->setTextColor(matrix->Color(255, 255, 0)); // Yellow
+        message = "Connecting";
+        break;
+    case ESP_A2D_CONNECTION_STATE_DISCONNECTED:
+        color = 0;                                      // Red
+        matrix->setTextColor(matrix->Color(255, 0, 0)); // Red
+        message = "Disconnected";
+        break;
+    case ESP_A2D_CONNECTION_STATE_DISCONNECTING:
+        color = 192;                                      // Magenta
+        matrix->setTextColor(matrix->Color(255, 0, 255)); // Magenta
+        message = "Disconnecting";
+        break;
+    }
+
+    // Draw top and bottom lines
+    for (int band = 0; band < NUM_BANDS; band++)
+    {
+        matrix->drawPixel(band, 0, CHSV(color, 255, 255));                 // Bottom line
+        matrix->drawPixel(band, NUM_LEDS_PER_BAND, CHSV(color, 255, 255)); // Top line
+    }
+    FastLED.show();
 }

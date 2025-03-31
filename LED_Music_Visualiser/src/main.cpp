@@ -1,11 +1,4 @@
-
-/***** Files and Libraries *****/
-#include <Arduino.h>
-#include <math.h>
-#include "Settings.h"
-#include "AudioData.h"
-#include "Calculations.h"
-#include "Display.h"
+#include "Global.h"
 
 /***** SETUP *****/
 void setup()
@@ -27,24 +20,9 @@ void setup()
 /***** MAIN LOOP *****/
 void loop()
 {
-  FastLED.clear();
-  int readSamples = readAudioSamples(); // Gets data from DMA buffers
-
-  for (int i = 0; i < readSamples; i++) //
+  // In bluetooth mode, only display if connected
+  if ((AUDIO_MODE == MODE_BLUETOOTH) && bluetoothConnexionState)
   {
-    vReal[i] = readBuffer[i];
-    vImag[i] = 0;
+    runDisplay();
   }
-
-  computeFFT();           // Applies all FFT calculations
-  assignFreqBinsValues(); // Gets values for frequency bands
-  processBandsRaw();      // Assign new band heights and peaks values
-  drawBandsHeightsRaw();  // Draw new band heights values (0 = normal, 1 = fading)
-  /*drawPeaks();            // Draw new band peaks   values
-  EVERY_N_MILLISECONDS(PEAK_DECAY_SPEED)
-  {
-    peaksDecay();
-  }*/
-
-  FastLED.show();
 }

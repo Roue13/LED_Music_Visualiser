@@ -1,5 +1,5 @@
-#include "AudioData.h"
 #include "Calculations.h"
+#include "Global.h"
 
 /***** Variables and instances *****/
 // For the FFT Library

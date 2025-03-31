@@ -1,13 +1,8 @@
 #ifndef AUDIODATA_H
 #define AUDIODATA_H
 
-/***** Files and Libraries *****/
-#include <Arduino.h>
-#include <algorithm>
-#include <driver/i2s.h>
-#include <driver/adc.h>
-#include "BluetoothA2DPSink.h"
 #include "Settings.h"
+#include <stdint.h>
 
 /***** Variables *****/
 #define I2S_PORT I2S_NUM_0 // Use I2S0 peripheral
