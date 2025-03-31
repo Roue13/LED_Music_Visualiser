@@ -1,6 +1,8 @@
 #include "Global.h"
 
+// Global variables
 bool bluetoothConnexionState = false;
+bool bluetoothRecievingData = false;
 
 void runDisplay()
 {
@@ -23,4 +25,11 @@ void runDisplay()
     peaksDecay();
   }*/
   FastLED.show();
+}
+
+void restartESP()
+{
+  Serial.println("Restarting ESP32...");
+  delay(1000);
+  ESP.restart();
 }

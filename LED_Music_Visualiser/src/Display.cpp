@@ -1,6 +1,6 @@
 #include "Display.h"
 #include "Global.h"
-#include <Fonts/FreeMono12pt7b.h> // How to use fonts : https://learn.adafruit.com/adafruit-gfx-graphics-library/using-fonts
+#include <Fonts/Picopixel.h> // How to use fonts : https://learn.adafruit.com/adafruit-gfx-graphics-library/using-fonts
 
 /* LED and MATRIX objects */
 CRGB leds[NUM_BANDS * NUM_LEDS_PER_BAND];
@@ -197,14 +197,41 @@ void peaksDecay()
     }
 }
 
+int XY(int x, int y)
+{
+    if (y % 2 == 0)
+    {
+        return y * 12 + x; // Ligne paire (de gauche à droite)
+    }
+    else
+    {
+        return y * 12 + (12 - 1 - x); // Ligne impaire (de droite à gauche)
+    }
+}
+
+void mirrorDisplay()
+{
+    for (int x = 0; x < matrix->width() / 2; x++)
+    {
+        for (int y = 0; y < matrix->height(); y++)
+        {
+            int oppositeX = matrix->width() - 1 - x;
+            CRGB temp = leds[XY(x, y)];
+            leds[XY(x, y)] = leds[XY(oppositeX, y)];
+            leds[XY(oppositeX, y)] = temp;
+        }
+    }
+}
+
 void drawConnectionState(esp_a2d_connection_state_t state)
 {
-    FastLED.clear();
+    unsigned long previous_time = millis();
 
     // Displayed text parameters
     matrix->setTextWrap(false); // Wrap -> Text starts on a new line when finishing the actual one
-    matrix->setTextSize(2);
-    matrix->setFont(&FreeMono12pt7b);
+    matrix->setTextSize(1);
+    matrix->setFont(&Picopixel);
+    matrix->setTextColor(matrix->Color(255, 255, 255));
 
     // Color parameters according to the connection state
     int8_t color = 0;    // Top and bottom lines color
@@ -212,32 +239,63 @@ void drawConnectionState(esp_a2d_connection_state_t state)
     switch (state)
     {
     case ESP_A2D_CONNECTION_STATE_CONNECTED:
-        color = 96;                                     // Green
-        matrix->setTextColor(matrix->Color(0, 255, 0)); // Green
-        message = "Connected";
+        color = 96; // Green
+        // matrix->setTextColor(matrix->Color(0, 255, 0)); // Green
+        message = "CONNECTED    ";
         break;
     case ESP_A2D_CONNECTION_STATE_CONNECTING:
-        color = 64;                                       // Yellow
-        matrix->setTextColor(matrix->Color(255, 255, 0)); // Yellow
-        message = "Connecting";
+        color = 64; // Yellow
+        // matrix->setTextColor(matrix->Color(255, 255, 0)); // Yellow
+        message = "CONNECTING    ";
         break;
     case ESP_A2D_CONNECTION_STATE_DISCONNECTED:
-        color = 0;                                      // Red
-        matrix->setTextColor(matrix->Color(255, 0, 0)); // Red
-        message = "Disconnected";
+        color = 0; // Red
+        // matrix->setTextColor(matrix->Color(255, 0, 0)); // Red
+        message = "DISCONNECTED    ";
         break;
     case ESP_A2D_CONNECTION_STATE_DISCONNECTING:
-        color = 192;                                      // Magenta
-        matrix->setTextColor(matrix->Color(255, 0, 255)); // Magenta
-        message = "Disconnecting";
+        color = 192; // Magenta
+        // matrix->setTextColor(matrix->Color(255, 0, 255)); // Magenta
+        message = "DISCONNECTING    ";
         break;
+    default:
+        return;
     }
 
-    // Draw top and bottom lines
-    for (int band = 0; band < NUM_BANDS; band++)
+    // Right to left message sweep + Top and Bottom lines
+    int textWidth = message.length() * 3;
+    int startX = matrix->width(); // Matrix start on the right
+
+    // Displays message while not changing state
+    while (a2dp_sink.get_connection_state() == state)
     {
-        matrix->drawPixel(band, 0, CHSV(color, 255, 255));                 // Bottom line
-        matrix->drawPixel(band, NUM_LEDS_PER_BAND, CHSV(color, 255, 255)); // Top line
+        // Vérifier si l'état Bluetooth a changé
+        if (a2dp_sink.get_connection_state() != state)
+        {
+            Serial.println("Leaving draw animation !");
+            return; // Quitte immédiatement si l'état change
+        }
+
+        // Right to left sweep
+        for (int x = startX; x > -textWidth; x--)
+        {
+            if (millis() - previous_time >= SPEED_STATE_MESSAGE_SWEEP)
+            {
+                previous_time = millis();
+                FastLED.clear();
+                // Top and bottom lines
+                for (int band = 0; band < NUM_BANDS; band++)
+                {
+                    matrix->drawPixel(band, 0, CHSV(color, 255, 255));                     // Bottom line
+                    matrix->drawPixel(band, 1, CHSV(color, 255, 255));                     // Bottom line + 1
+                    matrix->drawPixel(band, NUM_LEDS_PER_BAND - 2, CHSV(color, 255, 255)); // Top line - 1
+                    matrix->drawPixel(band, NUM_LEDS_PER_BAND - 1, CHSV(color, 255, 255)); // Top line
+                }
+                matrix->setCursor(x, NUM_LEDS_PER_BAND - 4); // Text positionning
+                matrix->print(message.c_str());              // Print the message
+                mirrorDisplay();                             // Mirror (doesn't work otherwise)
+                FastLED.show();
+            }
+        }
     }
-    FastLED.show();
 }

@@ -25,12 +25,16 @@
 /***** Variables *****/
 // Preferences pref; // Object to handle NVS memory
 extern bool bluetoothConnexionState;
+extern bool bluetoothRecievingData;
+extern BluetoothA2DPSink a2dp_sink;
 
 /***** Functions prototypes *****/
 
 /**
  * @brief Runs the main "display" loop
  */
-void runDisplay();
+void runDisplay(void);
+
+void restartESP(void);
 
 #endif /*   GLOBAL_H   */

@@ -11,14 +11,18 @@ extern int oldBandValues[NUM_BANDS];
 extern int bandValues[NUM_BANDS];
 extern int bandPeaks[NUM_BANDS];
 
-/***** Functions prototypes *****/
-
-void readDataStream(const uint8_t, uint32_t);
+/***** MEMS Microphone linked functions *****/
 int readDataMicrophone(void);
+void setupI2sMicrophone(void);
+
+/***** Bluetooth linked functions *****/
+void readDataStream(const uint8_t, uint32_t);
 int readDataBluetooth(void);
 int readAudioSamples(void);
-void setupI2sMicrophone(void);
+void checkBTConnectionState(void);
+void forceBluetoothReconnect(void);
 void setupI2sBluetooth(void);
+
 void setupI2sAudio(void);
 
 #endif /* AUDIODATA_H */

@@ -7,9 +7,11 @@ int bandValues[NUM_BANDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int bandPeaks[NUM_BANDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 BluetoothA2DPSink a2dp_sink;
 int bluetoothDataLength = 0; // Length of Bluetooth data
+unsigned long lastBTCheck = 0;
 
 void readDataStream(const uint8_t *data, uint32_t length)
 {
+    bluetoothRecievingData = true;
     int16_t *values = (int16_t *)data;
     int samples = length / sizeof(int16_t); // Nb of recieved samples
 
@@ -119,28 +121,31 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
     {
     case ESP_A2D_CONNECTION_STATE_CONNECTED:
         bluetoothConnexionState = true;
-#if DEBUG
+#if DEBUG_BT
         Serial.println("Bluetooth Connected!");
 #endif
         break;
 
     case ESP_A2D_CONNECTION_STATE_CONNECTING:
+        bluetoothRecievingData = false;
         bluetoothConnexionState = false;
-#if DEBUG
+#if DEBUG_BT
         Serial.println("Bluetooth Connecting!");
 #endif
         break;
 
     case ESP_A2D_CONNECTION_STATE_DISCONNECTED:
+        bluetoothRecievingData = false;
         bluetoothConnexionState = false;
-#if DEBUG
+#if DEBUG_BT
         Serial.println("Bluetooth Disconnected!");
 #endif
         break;
 
     case ESP_A2D_CONNECTION_STATE_DISCONNECTING:
+        bluetoothRecievingData = false;
         bluetoothConnexionState = false;
-#if DEBUG
+#if DEBUG_BT
         Serial.println("Bluetooth Disconnecting!");
 #endif
         break;
@@ -149,8 +154,45 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
     drawConnectionState(state);
 }
 
+void forceBluetoothReconnect()
+{
+    Serial.println("Forcing Bluetooth reconnect...");
+
+    Serial.println("Disconnecting Bluetooth...");
+    a2dp_sink.disconnect();
+    delay(2000); // Petit délai pour éviter un bug de reconnexion immédiate
+
+    // Reconnexion
+    Serial.println("Reconnecting Bluetooth...");
+    setupI2sBluetooth();
+}
+
+void checkBTConnectionState()
+{
+    if (a2dp_sink.get_connection_state() == ESP_A2D_CONNECTION_STATE_CONNECTING)
+    {
+        // Verify every 10sec if stuck in "Connecting state"
+        if (millis() - lastBTCheck > DELAY_BEFORE_FORCE_RECONNECT * 1000)
+        {
+            Serial.println("Disconnecting Bluetooth...");
+            a2dp_sink.disconnect();
+            restartESP();
+        }
+        lastBTCheck = millis();
+
+        // Reset time counter if a connexion has been established
+        if (bluetoothConnexionState)
+        {
+            lastBTCheck = 0;
+        }
+    }
+}
+
 void setupI2sBluetooth()
 {
+    // Free I2S ressources if already used
+    i2s_driver_uninstall(I2S_PORT);
+
     // Configure I2S for Bluetooth
     const i2s_config_t i2s_config_bluetooth = {
         .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
@@ -173,11 +215,15 @@ void setupI2sBluetooth()
         .data_out_num = I2S_SD};
     i2s_set_pin(I2S_PORT, &pin_config);
 
+    // Empty DMA buffers
+    i2s_zero_dma_buffer(I2S_PORT);
+
     // Activate BT with auto-reconnect
     bluetoothConnexionState = false;
     a2dp_sink.set_stream_reader(readDataStream);                    // Callback used when data is recieved
     a2dp_sink.set_on_connection_state_changed(bt_connexion_toggle); // Callback used when connexion state changes
-    a2dp_sink.start(BT_DEVICE_NAME, true);                          // Starts Bluetooth with "auto-reconnect"
+    a2dp_sink.start(BT_DEVICE_NAME, false);                         // Starts Bluetooth without "auto-reconnect" (false)
+    drawConnectionState(ESP_A2D_CONNECTION_STATE_DISCONNECTED);
 }
 
 void setupI2sAudio()

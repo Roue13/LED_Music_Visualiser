@@ -1,6 +1,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#define DEBUG_BT 0
+#define DEBUG_DATA 0
 #define DEBUG 0
 
 /***** PINS Connections *****/
@@ -15,11 +17,13 @@
 #define MODE_BLUETOOTH 1                      // Bluetooth audio input mode
 #define AUDIO_MODE MODE_BLUETOOTH             // Audio mode to use when starting
 #define BT_DEVICE_NAME "LED Music Visualiser" // Name shown when looking for the ESP32 Bluetooth device
+#define DELAY_BEFORE_FORCE_RECONNECT 10       // Delay before forcing a deco. + ESP_restart in seconds
+#define SPEED_STATE_MESSAGE_SWEEP 100         // Speed of the displayed state message in ms
 
 /***** Data Processing Parameters *****/
 #define SAMPLING_FREQUENCY 72000
 #define NB_SAMPLES 1024   // Between 8 and 1024
-#define NB_DMA_BUFFERS 32 // Between 2 and ??? 128 ???
+#define NB_DMA_BUFFERS 16 // Between 2 and ??? 128 ???
 // #define LOW_FREQUENCY 50     // Lowest frequency in Hz
 #define HIGH_FREQUENCY 16000 // Highest frequency in Hz
 
@@ -27,7 +31,7 @@
 #define NUM_BANDS 12         // Number of columns
 #define NUM_LEDS_PER_BAND 12 // Number of rows
 #define TOTAL_LEDS NUM_LEDS_PER_BAND *NUM_BANDS
-#define BRIGHTNESS 240             // LED Strip general brightness (between 0 and 255)
+#define BRIGHTNESS 180             // LED Strip general brightness (between 0 and 255)
 #define LED_STRIP_TYPE WS2812B     // LED Strip type
 #define LED_STRIP_VOLTAGE 5        // LED Strip required voltage (in V)
 #define LED_STRIP_MAX_CURRENT 3500 // Max power source current (in mA)

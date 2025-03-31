@@ -3,26 +3,29 @@
 /***** SETUP *****/
 void setup()
 {
-#if DEBUG
+#if DEBUG || DEBUG_BT || DEBUG_DATA
   Serial.begin(115200);
   Serial.println("***** Starting setup *****");
 #endif
-  setupI2sAudio();
   initDisplay();
   initVariables();
+  setupI2sAudio();
 
-#if DEBUG
+#if DEBUG || DEBUG_BT || DEBUG_DATA
   Serial.println("***** Setup finished *****");
-  delay(1000);
 #endif
 }
 
 /***** MAIN LOOP *****/
 void loop()
 {
-  // In bluetooth mode, only display if connected
-  if ((AUDIO_MODE == MODE_BLUETOOTH) && bluetoothConnexionState)
+  if (AUDIO_MODE == MODE_BLUETOOTH)
   {
-    runDisplay();
+    // checkBTConnectionState();
+    //   Run main display in BT Mode only if recieving data and connected
+    if (bluetoothConnexionState && bluetoothRecievingData)
+    {
+      runDisplay();
+    }
   }
 }
