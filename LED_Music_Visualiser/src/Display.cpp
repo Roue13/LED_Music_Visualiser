@@ -223,7 +223,7 @@ void mirrorDisplay()
     }
 }
 
-void drawConnectionState(esp_a2d_connection_state_t state)
+void drawConnectionState(esp_a2d_connection_state_t initial_state)
 {
     unsigned long previous_time = millis();
 
@@ -236,7 +236,7 @@ void drawConnectionState(esp_a2d_connection_state_t state)
     // Color parameters according to the connection state
     int8_t color = 0;    // Top and bottom lines color
     std::string message; // Displayed word
-    switch (state)
+    switch (initial_state)
     {
     case ESP_A2D_CONNECTION_STATE_CONNECTED:
         color = 96; // Green
@@ -267,18 +267,32 @@ void drawConnectionState(esp_a2d_connection_state_t state)
     int startX = matrix->width(); // Matrix start on the right
 
     // Displays message while not changing state
-    while (a2dp_sink.get_connection_state() == state)
+    // while ((a2dp_sink.get_connection_state() == initial_state) && LedTaskRunning)
+#if DEBUG_CONNEXION
+    if (xSemaphoreTake(serialMutex, portMAX_DELAY))
+    { // 🔹 Attendre le mutex
+        Serial.printf("\n LED Animation with state %s and LedTaskRunning : %d \n", message.c_str(), LedTaskRunning);
+        Serial.flush();
+        xSemaphoreGive(serialMutex); // 🔹 Libérer le mutex
+    }
+    else
     {
-        // Vérifier si l'état Bluetooth a changé
-        if (a2dp_sink.get_connection_state() != state)
+        Serial.println("Erreur : Impossible de prendre le mutex !");
+    }
+#endif
+    while (LedTaskRunning)
+    {
+        // Right to left text sweep + Top and Bottom lines
+        int x = startX;
+        while (x > -textWidth)
         {
-            Serial.println("Leaving draw animation !");
-            return; // Quitte immédiatement si l'état change
-        }
+            // Check state changes and leave function if it changes
+            if ((a2dp_sink.get_connection_state() != initial_state) || !LedTaskRunning)
+            {
+                return;
+            }
 
-        // Right to left sweep
-        for (int x = startX; x > -textWidth; x--)
-        {
+            // One move every SPEED_STATE_MESSAGE_SWEEP millisecond
             if (millis() - previous_time >= SPEED_STATE_MESSAGE_SWEEP)
             {
                 previous_time = millis();
@@ -295,6 +309,7 @@ void drawConnectionState(esp_a2d_connection_state_t state)
                 matrix->print(message.c_str());              // Print the message
                 mirrorDisplay();                             // Mirror (doesn't work otherwise)
                 FastLED.show();
+                x--;
             }
         }
     }

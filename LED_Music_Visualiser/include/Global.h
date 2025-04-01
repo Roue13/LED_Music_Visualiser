@@ -15,6 +15,8 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <arduinoFFT.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include "BluetoothA2DPSink.h"
 
 #include "Settings.h"
@@ -27,6 +29,9 @@
 extern bool bluetoothConnexionState;
 extern bool bluetoothRecievingData;
 extern BluetoothA2DPSink a2dp_sink;
+extern TaskHandle_t ledTaskHandle;
+extern bool LedTaskRunning;
+extern SemaphoreHandle_t serialMutex;
 
 /***** Functions prototypes *****/
 
@@ -36,5 +41,9 @@ extern BluetoothA2DPSink a2dp_sink;
 void runDisplay(void);
 
 void restartESP(void);
+
+void createTaskLedAnimation(void);
+
+void taskLedStateAnimation(void *);
 
 #endif /*   GLOBAL_H   */

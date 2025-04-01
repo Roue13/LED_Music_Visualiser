@@ -12,6 +12,7 @@ unsigned long lastBTCheck = 0;
 void readDataStream(const uint8_t *data, uint32_t length)
 {
     bluetoothRecievingData = true;
+    LedTaskRunning = false;
     int16_t *values = (int16_t *)data;
     int samples = length / sizeof(int16_t); // Nb of recieved samples
 
@@ -121,6 +122,7 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
     {
     case ESP_A2D_CONNECTION_STATE_CONNECTED:
         bluetoothConnexionState = true;
+        LedTaskRunning = true;
 #if DEBUG_BT
         Serial.println("Bluetooth Connected!");
 #endif
@@ -129,6 +131,7 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
     case ESP_A2D_CONNECTION_STATE_CONNECTING:
         bluetoothRecievingData = false;
         bluetoothConnexionState = false;
+        LedTaskRunning = false;
 #if DEBUG_BT
         Serial.println("Bluetooth Connecting!");
 #endif
@@ -137,6 +140,7 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
     case ESP_A2D_CONNECTION_STATE_DISCONNECTED:
         bluetoothRecievingData = false;
         bluetoothConnexionState = false;
+        LedTaskRunning = true;
 #if DEBUG_BT
         Serial.println("Bluetooth Disconnected!");
 #endif
@@ -145,13 +149,14 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
     case ESP_A2D_CONNECTION_STATE_DISCONNECTING:
         bluetoothRecievingData = false;
         bluetoothConnexionState = false;
+        LedTaskRunning = false;
 #if DEBUG_BT
         Serial.println("Bluetooth Disconnecting!");
 #endif
         break;
     }
 
-    drawConnectionState(state);
+    // drawConnectionState(state);
 }
 
 void forceBluetoothReconnect()
@@ -220,10 +225,10 @@ void setupI2sBluetooth()
 
     // Activate BT with auto-reconnect
     bluetoothConnexionState = false;
+    LedTaskRunning = true;
     a2dp_sink.set_stream_reader(readDataStream);                    // Callback used when data is recieved
     a2dp_sink.set_on_connection_state_changed(bt_connexion_toggle); // Callback used when connexion state changes
     a2dp_sink.start(BT_DEVICE_NAME, false);                         // Starts Bluetooth without "auto-reconnect" (false)
-    drawConnectionState(ESP_A2D_CONNECTION_STATE_DISCONNECTED);
 }
 
 void setupI2sAudio()

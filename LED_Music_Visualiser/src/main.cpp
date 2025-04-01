@@ -3,10 +3,13 @@
 /***** SETUP *****/
 void setup()
 {
-#if DEBUG || DEBUG_BT || DEBUG_DATA
+#if DEBUG || DEBUG_BT || DEBUG_DATA || DEBUG_CONNEXION
   Serial.begin(115200);
   Serial.println("***** Starting setup *****");
 #endif
+
+  createTaskLedAnimation();
+
   initDisplay();
   initVariables();
   setupI2sAudio();
