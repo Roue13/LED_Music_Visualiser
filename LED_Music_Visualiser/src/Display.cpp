@@ -235,39 +235,39 @@ void drawConnectionState(esp_a2d_connection_state_t initial_state)
 
     // Color parameters according to the connection state
     int8_t color = 0;    // Top and bottom lines color
-    std::string message; // Displayed word
+    std::string message; // Displayed message
     switch (initial_state)
     {
     case ESP_A2D_CONNECTION_STATE_CONNECTED:
         color = 96; // Green
-        // matrix->setTextColor(matrix->Color(0, 255, 0)); // Green
-        message = "CONNECTED    ";
+        message = "CONNECTED";
         break;
-    case ESP_A2D_CONNECTION_STATE_CONNECTING:
-        color = 64; // Yellow
-        // matrix->setTextColor(matrix->Color(255, 255, 0)); // Yellow
-        message = "CONNECTING    ";
+
+    case ESP_A2D_CONNECTION_STATE_CONNECTING: // Not used (almost never in this state)
+        color = 192;                          // Magenta
+        message = "CONNECTING";
         break;
+
     case ESP_A2D_CONNECTION_STATE_DISCONNECTED:
         color = 0; // Red
-        // matrix->setTextColor(matrix->Color(255, 0, 0)); // Red
-        message = "DISCONNECTED    ";
+        message = "DISCONNECTED";
         break;
-    case ESP_A2D_CONNECTION_STATE_DISCONNECTING:
-        color = 192; // Magenta
-        // matrix->setTextColor(matrix->Color(255, 0, 255)); // Magenta
-        message = "DISCONNECTING    ";
+
+    case ESP_A2D_CONNECTION_STATE_DISCONNECTING: // Nos used (almost never in this state)
+        color = 64;                              // Yellow
+        message = "DISCONNECTING";
         break;
+
     default:
         return;
     }
 
     // Right to left message sweep + Top and Bottom lines
-    int textWidth = message.length() * 3;
-    int startX = matrix->width(); // Matrix start on the right
+    message = message + "    ";           // Adds a large space for a better visual effect
+    int textWidth = message.length() * 3; // 3 = character width in pixels
+    int startX = matrix->width();         // Matrix start on the right
 
     // Displays message while not changing state
-    // while ((a2dp_sink.get_connection_state() == initial_state) && LedTaskRunning)
 #if DEBUG_CONNEXION
     if (xSemaphoreTake(serialMutex, portMAX_DELAY))
     { // 🔹 Attendre le mutex

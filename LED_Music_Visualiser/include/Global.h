@@ -23,6 +23,8 @@
 #include "AudioData.h"
 #include "Calculations.h"
 #include "Display.h"
+#include "Mems.h"
+#include "Bluetooth.h"
 
 /***** Variables *****/
 // Preferences pref; // Object to handle NVS memory
@@ -39,11 +41,9 @@ extern SemaphoreHandle_t serialMutex;
  * @brief Runs the main "display" loop
  */
 void runDisplay(void);
-
 void restartESP(void);
-
+void printWithMutexCheck(std::string);
 void createTaskLedAnimation(void);
-
 void taskLedStateAnimation(void *);
 
 #endif /*   GLOBAL_H   */

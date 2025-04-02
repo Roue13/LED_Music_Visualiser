@@ -3,7 +3,7 @@
 /***** SETUP *****/
 void setup()
 {
-#if DEBUG || DEBUG_BT || DEBUG_DATA || DEBUG_CONNEXION
+#if DEBUG || DEBUG_BT || DEBUG_DATA || DEBUG_CONNEXION || DEBUG_THREADS
   Serial.begin(115200);
   Serial.println("***** Starting setup *****");
 #endif

@@ -3,32 +3,26 @@
 
 /***** Variables and instances *****/
 // For the FFT Library
-double vReal[NB_SAMPLES];
-double vImag[NB_SAMPLES];
+double vReal[NB_SAMPLES] = {0};
+double vImag[NB_SAMPLES] = {0}; // vImag will always stay at 0
 ArduinoFFT<double> FFT = ArduinoFFT<double>(vReal, vImag, NB_SAMPLES, SAMPLING_FREQUENCY);
 
-// Other
 const double binWidth = (double)SAMPLING_FREQUENCY / (double)NB_SAMPLES;
 const int LOW_FREQUENCY = (int)binWidth;
 const double freqMultiplierPerBand = pow((double)(HIGH_FREQUENCY / LOW_FREQUENCY), 1 / (double)(NUM_BANDS - 1));
 const double nbUsableBins = (NB_SAMPLES / 2) - 1;
-int centerFreqBand[NUM_BANDS + 1];
-int centerFreqBin[NUM_BANDS + 1];
-int lowFreqBin[NUM_BANDS];
-int highFreqBin[NUM_BANDS];
+int centerFreqBand[NUM_BANDS + 1] = {0};
+int centerFreqBin[NUM_BANDS + 1] = {0};
+int lowFreqBin[NUM_BANDS] = {0};
+int highFreqBin[NUM_BANDS] = {0};
+int oldBandValues[NUM_BANDS] = {0};
+int bandValues[NUM_BANDS] = {0};
+int bandPeaks[NUM_BANDS] = {0};
 
 /***** Variables and instances *****/
 
 void initVariables()
 {
-    // Initialise band values / peaks variables
-    for (int i = 0; i < NUM_BANDS; i++)
-    {
-        oldBandValues[i] = 0;
-        bandValues[i] = 0;
-        bandPeaks[i] = 0;
-    }
-
     // Center frequency and center bin (first)
     for (int band = 0; band < (NUM_BANDS + 1); band++)
     {

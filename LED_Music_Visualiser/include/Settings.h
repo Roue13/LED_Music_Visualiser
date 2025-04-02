@@ -1,16 +1,18 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+/***** DEBUG settings. Set to 1 to activate, else 0 *****/
 #define DEBUG_BT 0
 #define DEBUG_DATA 0
 #define DEBUG_CONNEXION 0
+#define DEBUG_THREADS 1
 #define DEBUG 0
 
 /***** PINS Connections *****/
-#define I2S_WS 25       // WS pin
-#define I2S_SD 33       // SD pin
-#define I2S_SCK 32      // SCK pin
-#define LED_DATA_PIN 23 // Led strips DATA pin
+#define I2S_WS 25       // MEMS WS pin
+#define I2S_SD 33       // MEMS SD pin
+#define I2S_SCK 32      // MEMS SCK pin
+#define LED_DATA_PIN 23 // Led strip DATA pin
 #define BTN_MODE_PIN 27 // Button used to switch between audio input modes
 
 /***** Bluetooth Parameters *****/
@@ -18,8 +20,8 @@
 #define MODE_BLUETOOTH 1                      // Bluetooth audio input mode
 #define AUDIO_MODE MODE_BLUETOOTH             // Audio mode to use when starting
 #define BT_DEVICE_NAME "LED Music Visualiser" // Name shown when looking for the ESP32 Bluetooth device
-#define DELAY_BEFORE_FORCE_RECONNECT 10       // Delay before forcing a deco. + ESP_restart in seconds
-#define SPEED_STATE_MESSAGE_SWEEP 100         // Speed of the displayed state message in ms
+#define DELAY_BEFORE_FORCE_RECONNECT 10       // Delay before forcing a deconnexion + ESP_restart in seconds
+#define SPEED_STATE_MESSAGE_SWEEP 85          // Speed of the displayed state message in ms
 
 /***** Data Processing Parameters *****/
 #define SAMPLING_FREQUENCY 72000

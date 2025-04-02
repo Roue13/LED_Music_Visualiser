@@ -4,6 +4,7 @@
 bool bluetoothConnexionState = false;
 bool bluetoothRecievingData = false;
 bool LedTaskRunning = true;
+char taskName[] = "LED State Animation";
 TaskHandle_t ledTaskHandle = NULL; // Stocke la tâche pour la contrôler
 SemaphoreHandle_t serialMutex = xSemaphoreCreateMutex();
 
@@ -15,7 +16,6 @@ void runDisplay()
   for (int i = 0; i < readSamples; i++) //
   {
     vReal[i] = readBuffer[i];
-    vImag[i] = 0;
   }
 
   computeFFT();           // Applies all FFT calculations
@@ -37,30 +37,37 @@ void restartESP()
   ESP.restart();
 }
 
+void printWithMutexCheck(std::string message)
+{
+  if (xSemaphoreTake(serialMutex, portMAX_DELAY))
+  { // 🔹 Wait for the mutex
+    Serial.println(message.c_str());
+    Serial.flush();
+    xSemaphoreGive(serialMutex); // 🔹 Free the mutex
+  }
+  else
+  {
+    Serial.printf("\n Error ! Impossible to take the mutex !   At message : %s \n", message);
+  }
+}
+
 void taskLedStateAnimation(void *pvParameters)
 {
-  for (;;)
+  for (;;) // Infinite loop (needed for the task to work properly)
   {
     // Delete the task if data is recieved
     if (bluetoothRecievingData)
     {
-#if DEBUG_CONNEXION
-      if (xSemaphoreTake(serialMutex, portMAX_DELAY))
-      { // 🔹 Attendre le mutex
-        Serial.println("\n Data recieved. Deleting the task \n");
-        Serial.flush();
-        xSemaphoreGive(serialMutex); // 🔹 Libérer le mutex
-      }
-      else
-      {
-        Serial.println("\n Erreur : Impossible de prendre le mutex ! \n");
-      }
+#if DEBUG_THREADS
+      char buffer[200];
+      sprintf(buffer, "\n Data recieved. Deleting the task \n");
+      printWithMutexCheck(buffer);
 #endif
-      vTaskDelete(NULL);
+      vTaskDelete(NULL); // Delete task
     }
     if (LedTaskRunning)
     {
-#if DEBUG_CONNEXION
+#if DEBUG_THREADS
       if (xSemaphoreTake(serialMutex, portMAX_DELAY))
       { // 🔹 Attendre le mutex
         Serial.println("\n Drawing LED State Animation (Task) \n");
@@ -76,17 +83,10 @@ void taskLedStateAnimation(void *pvParameters)
     }
     else
     {
-#if DEBUG_CONNEXION
-      if (xSemaphoreTake(serialMutex, portMAX_DELAY))
-      { // 🔹 Attendre le mutex
-        Serial.printf("\n Not doing animation. LedTaskRunning : %d   and state : %d \n", LedTaskRunning, a2dp_sink.get_connection_state());
-        Serial.flush();
-        xSemaphoreGive(serialMutex); // 🔹 Libérer le mutex
-      }
-      else
-      {
-        Serial.println("\n Erreur : Impossible de prendre le mutex ! \n");
-      }
+#if DEBUG_THREADS
+      char buffer[200];
+      sprintf(buffer, "\n Not doing animation. LedTaskRunning : %d   and state : %d \n", LedTaskRunning, a2dp_sink.get_connection_state());
+      printWithMutexCheck(buffer);
 #endif
     }
   }
@@ -94,10 +94,10 @@ void taskLedStateAnimation(void *pvParameters)
 
 void createTaskLedAnimation(void)
 {
-#if DEBUG_CONNEXION
+#if DEBUG_THREADS
   if (serialMutex == NULL)
   {
-    Serial.println("Erreur lors de la création du mutex");
+    Serial.println("Error while creating the mutex");
   }
 #endif
 
@@ -112,15 +112,16 @@ void createTaskLedAnimation(void)
   );
 
   // Print message indicating if task was created successfully
-#if DEBUG_CONNEXION
+#if DEBUG_THREADS
+  char buffer[200];
   if (taskStatus != pdPASS)
   {
-    Serial.println("Failed to create task");
-    Serial.println(taskStatus); // Print error code
+    sprintf(buffer, "\n Failed to create task '%s'. Error code : %d \n", taskName, taskStatus);
   }
   else
   {
-    Serial.println("Task created successfully");
+    sprintf(buffer, "\n Task '%s' created successfully \n", taskName);
   }
+  printWithMutexCheck(buffer);
 #endif
 }
