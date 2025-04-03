@@ -57,6 +57,7 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
         bluetoothRecievingData = false;
         bluetoothConnexionState = false;
         LedTaskRunning = true;
+        vTaskResume(ledTaskHandle);
 #if DEBUG_BT
         Serial.println("Bluetooth Disconnected!");
 #endif
@@ -71,8 +72,6 @@ void bt_connexion_toggle(esp_a2d_connection_state_t state, void *ptr)
 #endif
         break;
     }
-
-    // drawConnectionState(state);
 }
 
 void forceBluetoothReconnect()

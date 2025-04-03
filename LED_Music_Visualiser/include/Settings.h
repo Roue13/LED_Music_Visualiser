@@ -5,7 +5,7 @@
 #define DEBUG_BT 0
 #define DEBUG_DATA 0
 #define DEBUG_CONNEXION 0
-#define DEBUG_THREADS 1
+#define DEBUG_THREADS 0
 #define DEBUG 0
 
 /***** PINS Connections *****/

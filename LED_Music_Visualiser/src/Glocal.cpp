@@ -16,6 +16,7 @@ void runDisplay()
   for (int i = 0; i < readSamples; i++) //
   {
     vReal[i] = readBuffer[i];
+    vImag[i] = 0;
   }
 
   computeFFT();           // Applies all FFT calculations
@@ -55,17 +56,17 @@ void taskLedStateAnimation(void *pvParameters)
 {
   for (;;) // Infinite loop (needed for the task to work properly)
   {
-    // Delete the task if data is recieved
+    // Suspend the task if data is recieved
     if (bluetoothRecievingData)
     {
 #if DEBUG_THREADS
       char buffer[200];
-      sprintf(buffer, "\n Data recieved. Deleting the task \n");
+      sprintf(buffer, "\n Data recieved. Suspending the task \n");
       printWithMutexCheck(buffer);
 #endif
-      vTaskDelete(NULL); // Delete task
+      vTaskSuspend(NULL); // Suspend task
     }
-    if (LedTaskRunning)
+    if (LedTaskRunning && !bluetoothRecievingData)
     {
 #if DEBUG_THREADS
       if (xSemaphoreTake(serialMutex, portMAX_DELAY))
@@ -102,13 +103,13 @@ void createTaskLedAnimation(void)
 #endif
 
   BaseType_t taskStatus = xTaskCreatePinnedToCore(
-      taskLedStateAnimation, // 🔹 Fonction exécutée
+      taskLedStateAnimation, // Fonction exécutée
       "LEDTask",             // Nom de la tâche
       2048,                  // Taille de la stack
       NULL,                  // Paramètre
       1,                     // Priorité
-      &ledTaskHandle,        // 🔹 Stocke le handle pour contrôle
-      1                      // 🔹 Exécuter sur Core 1
+      &ledTaskHandle,        // Stocke le handle pour contrôle
+      1                      // Exécuter sur Core 1
   );
 
   // Print message indicating if task was created successfully

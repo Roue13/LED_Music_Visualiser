@@ -225,8 +225,6 @@ void mirrorDisplay()
 
 void drawConnectionState(esp_a2d_connection_state_t initial_state)
 {
-    unsigned long previous_time = millis();
-
     // Displayed text parameters
     matrix->setTextWrap(false); // Wrap -> Text starts on a new line when finishing the actual one
     matrix->setTextSize(1);
@@ -292,25 +290,21 @@ void drawConnectionState(esp_a2d_connection_state_t initial_state)
                 return;
             }
 
-            // One move every SPEED_STATE_MESSAGE_SWEEP millisecond
-            if (millis() - previous_time >= SPEED_STATE_MESSAGE_SWEEP)
+            FastLED.clear();
+            // Top and bottom lines
+            for (int band = 0; band < NUM_BANDS; band++)
             {
-                previous_time = millis();
-                FastLED.clear();
-                // Top and bottom lines
-                for (int band = 0; band < NUM_BANDS; band++)
-                {
-                    matrix->drawPixel(band, 0, CHSV(color, 255, 255));                     // Bottom line
-                    matrix->drawPixel(band, 1, CHSV(color, 255, 255));                     // Bottom line + 1
-                    matrix->drawPixel(band, NUM_LEDS_PER_BAND - 2, CHSV(color, 255, 255)); // Top line - 1
-                    matrix->drawPixel(band, NUM_LEDS_PER_BAND - 1, CHSV(color, 255, 255)); // Top line
-                }
-                matrix->setCursor(x, NUM_LEDS_PER_BAND - 4); // Text positionning
-                matrix->print(message.c_str());              // Print the message
-                mirrorDisplay();                             // Mirror (doesn't work otherwise)
-                FastLED.show();
-                x--;
+                matrix->drawPixel(band, 0, CHSV(color, 255, 255));                     // Bottom line
+                matrix->drawPixel(band, 1, CHSV(color, 255, 255));                     // Bottom line + 1
+                matrix->drawPixel(band, NUM_LEDS_PER_BAND - 2, CHSV(color, 255, 255)); // Top line - 1
+                matrix->drawPixel(band, NUM_LEDS_PER_BAND - 1, CHSV(color, 255, 255)); // Top line
             }
+            matrix->setCursor(x, NUM_LEDS_PER_BAND - 4); // Text positionning
+            matrix->print(message.c_str());              // Print the message
+            mirrorDisplay();                             // Mirror (doesn't work otherwise)
+            FastLED.show();
+            x--;
+            vTaskDelay(SPEED_STATE_MESSAGE_SWEEP / portTICK_PERIOD_MS);
         }
     }
 }
